@@ -1,0 +1,33 @@
+[gd_scene load_steps=7 format=3 uid="uid://d1idu51i4iovr"]
+
+[ext_resource type="Script" uid="uid://442nmptfo3ue" path="res://Scripts/Player/Player.gd" id="1_4flbx"]
+[ext_resource type="Script" uid="uid://bfa765ktibksr" path="res://StateMachine/StateMachine.gd" id="2_hqtel"]
+[ext_resource type="Script" uid="uid://do10xbufa3nw3" path="res://Scripts/Player/PlayerStates/Move.gd" id="3_hqtel"]
+[ext_resource type="Script" uid="uid://rd8qd3uq7cu0" path="res://Scenes/idle.gd" id="4_vgqql"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_onrkg"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_i3pqv"]
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_4flbx")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_onrkg")
+skeleton = NodePath("../CollisionShape3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_i3pqv")
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("2_hqtel")
+initial_state = NodePath("Idle")
+metadata/_custom_type_script = "uid://bfa765ktibksr"
+
+[node name="Move" type="Node" parent="StateMachine"]
+script = ExtResource("3_hqtel")
+metadata/_custom_type_script = "uid://ds5k2npt0lvep"
+
+[node name="Idle" type="Node" parent="StateMachine"]
+script = ExtResource("4_vgqql")
+metadata/_custom_type_script = "uid://ds5k2npt0lvep"

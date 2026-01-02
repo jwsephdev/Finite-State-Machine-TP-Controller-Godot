@@ -1,0 +1,101 @@
+[gd_scene load_steps=13 format=3 uid="uid://d1idu51i4iovr"]
+
+[ext_resource type="Script" uid="uid://cbf8i07npwvjg" path="res://Scripts/Player/player.gd" id="1_cvnsp"]
+[ext_resource type="Script" uid="uid://bfa765ktibksr" path="res://StateMachine/StateMachine.gd" id="2_hqtel"]
+[ext_resource type="Script" uid="uid://rd8qd3uq7cu0" path="res://Scripts/Player/PlayerStates/idle.gd" id="3_6t5aa"]
+[ext_resource type="Script" uid="uid://mqrj6f21gvur" path="res://Scripts/Player/PlayerStates/move.gd" id="4_vgqql"]
+[ext_resource type="Script" uid="uid://82wlajneqp85" path="res://Scripts/Player/PlayerStates/jump.gd" id="5_fkybt"]
+[ext_resource type="Script" uid="uid://cpurh5ib3npjv" path="res://Scripts/Player/Camera/camera_controller.gd" id="6_x3wgy"]
+[ext_resource type="Script" uid="uid://bvkovht2bwjy4" path="res://Scripts/Player/Debug/debuggraph.gd" id="7_3smsa"]
+
+[sub_resource type="GDScript" id="GDScript_3smsa"]
+script/source = "extends State
+@onready var player_collision: CollisionShape3D = $\"../../player_collision\"
+
+var shape = CapsuleMesh.new()
+
+var crouch_height := 1.2
+
+
+func enter() -> void:
+	pass
+	
+func exit() -> void:
+	pass
+	
+func update(_delta: float) -> void:
+	pass
+	
+func physics_update(_delta:float) -> void:
+	shape.set_height(crouch_height)
+	player_collision.shape = shape
+"
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_i3pqv"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8erm5"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_onrkg"]
+material = SubResource("StandardMaterial3D_8erm5")
+
+[sub_resource type="BoxMesh" id="BoxMesh_f1ek2"]
+size = Vector3(0.16, 0.935, 0.13)
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_cvnsp")
+
+[node name="debuggraph" type="VBoxContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 50.0
+script = ExtResource("7_3smsa")
+
+[node name="fps" type="Label" parent="debuggraph"]
+layout_mode = 2
+
+[node name="state" type="Label" parent="debuggraph"]
+layout_mode = 2
+
+[node name="camera_controller" type="Node" parent="."]
+script = ExtResource("6_x3wgy")
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("2_hqtel")
+initial_state = NodePath("Idle")
+metadata/_custom_type_script = "uid://bfa765ktibksr"
+
+[node name="Idle" type="Node" parent="StateMachine"]
+script = ExtResource("3_6t5aa")
+metadata/_custom_type_script = "uid://ds5k2npt0lvep"
+
+[node name="Move" type="Node" parent="StateMachine"]
+script = ExtResource("4_vgqql")
+metadata/_custom_type_script = "uid://ds5k2npt0lvep"
+
+[node name="Jump" type="Node" parent="StateMachine"]
+script = ExtResource("5_fkybt")
+metadata/_custom_type_script = "uid://ds5k2npt0lvep"
+
+[node name="Crouch" type="Node" parent="StateMachine"]
+script = SubResource("GDScript_3smsa")
+metadata/_custom_type_script = "uid://ds5k2npt0lvep"
+
+[node name="player_collision" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_i3pqv")
+
+[node name="camera_mount" type="Node3D" parent="."]
+
+[node name="camera_springarm" type="SpringArm3D" parent="camera_mount"]
+spring_length = 5.0
+
+[node name="camera" type="Camera3D" parent="camera_mount/camera_springarm"]
+
+[node name="visuals" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="visuals"]
+mesh = SubResource("CapsuleMesh_onrkg")
+skeleton = NodePath("../../player_collision")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="visuals"]
+transform = Transform3D(1, 0, 0, 0, 0.86981374, 0.49338025, 0, -0.49338025, 0.86981374, 0, 0.4317028, -0.5694777)
+mesh = SubResource("BoxMesh_f1ek2")
